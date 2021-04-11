@@ -14,7 +14,7 @@ class Algorithm :
     currentProcess = None
     currentProcessTime = 0 
     end_line = False
-
+    emptyProcess = None
     
       
     def fcfs(self, t) :

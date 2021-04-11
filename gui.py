@@ -18,7 +18,7 @@ for i in range(1, 16):
 
 al = algorithms.Algorithm(plist, 2)
 execution_speed = 1000  # 진행속도
-mp = 1 # multiprocess
+mp = 1  # multiprocess
 
 window = tkinter.Tk()
 window.title("운영체제 8조")
@@ -32,13 +32,14 @@ table_font = ""
 
 # default setting
 # Ready queue (for realtime)
+readyqueueList = []
 title_readyqueue = tkinter.Label(
     window, text="Ready Queue", width=12, height=4, font=label_font)
-# for i in range(0, mp) :
-#     globals()['canvas_readyqueue{}'.format(i)] = tkinter.Canvas(
-#     window, relief="solid", width=930, height=60, bd=3)
-canvas_readyqueue = tkinter.Canvas(
-    window, relief="solid", width=930, height=60, bd=3)
+# multiprocess set
+for i in range(0, mp):
+    globals()['canvas_readyqueue{}'.format(i+1)] = tkinter.Canvas(
+        window, relief="solid", width=930, height=60, bd=3)
+    readyqueueList.append(globals()['canvas_readyqueue{}'.format(i+1)])
 
 # Gantt Chart (for realtime)
 title_ganttchart = tkinter.Label(
@@ -49,6 +50,8 @@ title_runtime = tkinter.Label(
     window, textvariable=text_runtime, width=20, height=4, anchor='w', font=label_font)
 canvas_ganttchart = tkinter.Canvas(
     window, relief="solid", width=930, height=60, bd=3)
+
+
 
 # Result Table
 title_resulttable = tkinter.Label(
@@ -69,13 +72,11 @@ table_resulttable.column("NTT", width='130', anchor='center')
 table_resulttable.heading("NTT", text="Normalized TT(NTT)")
 
 def defaultGui():
-
     # Ready queue (for realtime)
     title_readyqueue.place(x=10, y=350)
-    # for i in range(0, mp) :
-    #     globals()['canvas_readyqueue{}'.format(i)].place(x = 10, y = 400 + 50 * i, width = 940)
-    canvas_readyqueue.place(x=10, y=400, width=940)
-
+    for i in range(0, mp):
+        readyqueueList[i].place(
+            x=10, y=400 + 50 * (i-1), width=940)
     # Gantt Chart (for realtime)
     title_ganttchart.place(x=10, y=500)
     title_runtime.place(x=125, y=500)
@@ -84,15 +85,15 @@ def defaultGui():
     # Result Table
     title_resulttable.place(x=10, y=620)
     table_resulttable.place(x=10, y=670, width=940, height=350)
+
     # #0 space 6개, table default setting
+    iid_num = 1
+    for p in plist:
+        table_resulttable.insert('', 'end', text="      " + p.name,
+            values=(p.at, p.bt, p.wt, p.tt, p.ntt), iid="p" + str(iid_num))
+        iid_num += 1
 defaultGui()
 
-
-iid_num = 1
-for p in plist:
-    table_resulttable.insert('', 'end', text="      " + p.name,
-                             values=(p.at, p.bt, p.wt, p.tt, p.ntt), iid="p" + str(iid_num))
-    iid_num += 1
 
 
 def renew_resulttable(process):
@@ -100,7 +101,8 @@ def renew_resulttable(process):
 
 
 def show_ready_queue(*queue):
-    canvas_readyqueue.delete("all")
+    for i in range(0, mp):
+        readyqueueList[i].delete("all")
     count = 1
     for p in queue:
         if p == None:
@@ -111,12 +113,12 @@ def show_ready_queue(*queue):
         x2 = 5 + 60 * count  # max = 935
         y2 = 70
         # (60, 65)의 사각형으로 ready_queue 채우기
-        rectangle = canvas_readyqueue.create_rectangle(
+        rectangle = canvas_readyqueue1.create_rectangle(
             x1, y1, x2, y2, fill=fill_color, width=2)
-        text = canvas_readyqueue.create_text(
+        text = canvas_readyqueue1.create_text(
             x2-30, 35, text=p.name, font=label_font)
         count = count + 1
-    canvas_readyqueue.place(x=10, y=400)
+    canvas_readyqueue1.place(x=10, y=400)
 
 
 def put_gantt_chart(*timeLine):
@@ -143,19 +145,22 @@ def main():
     i = 0
     while True:
         start_time = time.time()
-        queue, timeLine, finished, isEnd = al.srtn(i)
+        # insert ready_process
+        return_queue, return_timeLine, return_finished, isEnd = al.srtn(i)
         text_runtime.set('RUNTIME : ' + str(execution_speed * i) + ' ms')
-        if len(queue) != 0:
-            thread1 = threading.Thread(target=show_ready_queue, args=queue)
+        if len(return_queue) != 0:
+            thread1 = threading.Thread(
+                target=show_ready_queue, args=(return_queue))
             thread1.start()
         else:
-            canvas_readyqueue.delete("all")
-        if timeLine != None:
-            thread2 = threading.Thread(target=put_gantt_chart, args=timeLine)
+            canvas_readyqueue1.delete("all")
+        if return_timeLine != None:
+            thread2 = threading.Thread(
+                target=put_gantt_chart, args=return_timeLine)
             thread2.start()
-        if finished != None:
-            table_resulttable.item(finished.name.lower(), text="      " + finished.name, values=(
-                finished.at, finished.bt, finished.wt, finished.tt, finished.ntt))
+        if return_finished != None:
+            table_resulttable.item(return_finished.name.lower(), text="      " + return_finished.name, values=(
+                return_finished.at, return_finished.bt, return_finished.wt, return_finished.tt, return_finished.ntt))
         if thread1 != None:
             thread1.join()
         if thread2 != None:
