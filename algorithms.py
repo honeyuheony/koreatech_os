@@ -1,25 +1,18 @@
 import process
-import threading
-import random
-
 
 class Algorithm :
     # class var
-    plist = []
-    timeLine = [] # 이차원 배열으로 수정 필요
-    queue = []
-    index = 0
-    timeQ = 0 
-    last_gantt_chart = None
-    currentProcess = None
-    currentProcessTime = 0
+    plist = [] # Process list
+    queue = [] # Readyqueue data
+    timeLine = [] # Ganttchart data
+    index = 0 # Process check
+    timeQ = 0 # Time quantum
     multiProcessor = [] # 프로세서 리스트로
     multiProcessorTime = [] # RR때 쓸 시간
     countOfProcessor = 0 # 프로세서 개수
-    end_line = False
+    end_line = False # End process check
 
     
-
     def fcfs(self, t) :
         # reset
         plist = self.plist
@@ -40,14 +33,13 @@ class Algorithm :
 
             #else :
         # gantt chart(timeLine)
-
         for i in range(countOfProcessor):
             if len(timeLine[i]) > 31 : # Gantt Chart Max Length
                 timeLine[i].pop(0)
             if multiProcessor[i] == None:
                 timeLine[i].append(None)
             if multiProcessor[i] != None:
-                timeLine[i].append(multiProcessor[i]) # ui에 맞게 수정 필요
+                timeLine[i].append(multiProcessor[i]) 
                 multiProcessor[i].decrease_rt()
                 if multiProcessor[i].rt == 0:
                     multiProcessor[i].set_tt()
@@ -100,15 +92,81 @@ class Algorithm :
             multiProcessor[multiProcessor.index(None)] = queue.pop(0)
 
         # launch
-
-
         for i in range(countOfProcessor):
             if len(timeLine[i]) > 31:  # Gantt Chart Max Length
                 timeLine[i].pop(0)
             if multiProcessor[i] == None:
                 timeLine[i].append(None)
             if multiProcessor[i] != None:
-                timeLine[i].append(multiProcessor[i])  # ui에 맞게 수정 필요
+                timeLine[i].append(multiProcessor[i])  
+                multiProcessor[i].decrease_rt()
+                multiProcessorTime[i] += 1
+                if multiProcessor[i].rt == 0:
+                    multiProcessor[i].set_tt()
+                    multiProcessor[i].set_ntt()
+                    finishProcess.append(multiProcessor[i])
+                    print(multiProcessor[i].name, multiProcessor[i].wt)
+                    multiProcessor[i] = None
+                    multiProcessorTime[i] = 0
+
+        if(len(queue)!=0):
+            for p in queue:
+                p.wt+=1
+
+        if (multiProcessor.count(None) == countOfProcessor and len(queue) == 0 and index == len(plist)):
+            self.end_line = True
+        # apply
+        self.index = index
+        self.queue = queue
+        self.timeLine = timeLine
+        self.index = index
+        self.multiProcessor = multiProcessor
+        self.multiProcessorTime = multiProcessorTime
+        return (queue, timeLine, finishProcess, self.end_line)
+
+    def rr_test(self, t) :
+        # reset
+        plist = self.plist
+        queue = self.queue
+        timeLine = self.timeLine
+        index = self.index
+        timeQ = self.timeQ
+        finishProcess = []
+        multiProcessor = self.multiProcessor
+        countOfProcessor = self.countOfProcessor
+        multiProcessorTime = self.multiProcessorTime
+
+        total_bt = 0
+        for p in queue :
+            total_bt += p.bt
+        if len(queue) == 0 :
+            timeQ = 0
+        else :
+            timeQ = (total_bt / len(queue))
+
+        for i in range(countOfProcessor):
+            if multiProcessor[i] != None and multiProcessorTime[i] == timeQ:
+                queue.append(multiProcessor[i])
+                multiProcessor[i] = None
+                multiProcessorTime[i] = 0
+
+
+        # ready queue(queue)
+        while (index < len(plist) and plist[index].at == t):
+            queue.append(plist[index])
+            index += 1
+
+        while len(queue) != 0 and multiProcessor.count(None):
+            multiProcessor[multiProcessor.index(None)] = queue.pop(0)
+
+        # launch
+        for i in range(countOfProcessor):
+            if len(timeLine[i]) > 31:  # Gantt Chart Max Length
+                timeLine[i].pop(0)
+            if multiProcessor[i] == None:
+                timeLine[i].append(None)
+            if multiProcessor[i] != None:
+                timeLine[i].append(multiProcessor[i])  
                 multiProcessor[i].decrease_rt()
                 multiProcessorTime[i] += 1
                 if multiProcessor[i].rt == 0:
@@ -164,7 +222,7 @@ class Algorithm :
             if multiProcessor[i] == None:
                 timeLine[i].append(None)
             if multiProcessor[i] != None:
-                timeLine[i].append(multiProcessor[i])  # ui에 맞게 수정 필요
+                timeLine[i].append(multiProcessor[i])  
                 multiProcessor[i].decrease_rt()
                 if multiProcessor[i].rt == 0:
                     multiProcessor[i].set_tt()
@@ -223,7 +281,7 @@ class Algorithm :
             if multiProcessor[i] == None:
                 timeLine[i].append(None)
             if multiProcessor[i] != None:
-                timeLine[i].append(multiProcessor[i])  # ui에 맞게 수정 필요
+                timeLine[i].append(multiProcessor[i])  
                 multiProcessor[i].decrease_rt()
                 if multiProcessor[i].rt == 0:
                     multiProcessor[i].set_tt()
@@ -243,11 +301,10 @@ class Algorithm :
         self.index = index
         self.queue = queue
         self.timeLine = timeLine
-        self.index = index
         self.multiProcessor = multiProcessor
         return (queue, timeLine, finishProcess, self.end_line)
 
-
+    
     def hrrn(self, t):
         # reset
         plist = self.plist
@@ -277,7 +334,7 @@ class Algorithm :
             if multiProcessor[i] == None:
                 timeLine[i].append(None)
             if multiProcessor[i] != None:
-                timeLine[i].append(multiProcessor[i])  # ui에 맞게 수정 필요
+                timeLine[i].append(multiProcessor[i])  
                 multiProcessor[i].decrease_rt()
                 if multiProcessor[i].rt == 0:
                     multiProcessor[i].set_tt()

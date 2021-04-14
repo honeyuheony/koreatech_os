@@ -6,7 +6,6 @@ import threading
 import random
 import process
 import algorithms
-from multiprocessing import Process as mp
 
 plist = []
 at_start = 0
@@ -16,8 +15,8 @@ for i in range(1, 16):
     plist.append(globals()['p{}'.format(i)])
     at_start += random.randrange(1, 3)
 
-al = algorithms.Algorithm(plist, 4)
-execution_speed = 1000  # 진행속도
+al = algorithms.Algorithm(plist, 1)
+execution_speed = 100  # 진행속도
 mp = 1  # multiprocess
 
 window = tkinter.Tk()
@@ -137,7 +136,7 @@ def main():
     while True:
         start_time = time.time()
         # insert ready_process
-        return_queue, return_timeLine, return_finished, isEnd = al.srtn(i)
+        return_queue, return_timeLine, return_finished, isEnd = al.rr_test(i)
         i += 1
         text_runtime.set('RUNTIME : ' + str(execution_speed * i) + ' ms')
         if len(return_queue) != 0:
