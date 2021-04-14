@@ -10,7 +10,7 @@ class Algorithm :
     multiProcessor = [] # 프로세서 리스트로
     multiProcessorTime = [] # RR때 쓸 시간
     countOfProcessor = 0 # 프로세서 개수
-    end_line = False # End process check
+    end_line = False # End
 
     
     def fcfs(self, t) :
@@ -93,7 +93,7 @@ class Algorithm :
 
         # launch
         for i in range(countOfProcessor):
-            if len(timeLine[i]) > 31:  # Gantt Chart Max Length
+            if len(timeLine[i]) > 30:  # Gantt Chart Max Length
                 timeLine[i].pop(0)
             if multiProcessor[i] == None:
                 timeLine[i].append(None)
@@ -161,7 +161,7 @@ class Algorithm :
 
         # launch
         for i in range(countOfProcessor):
-            if len(timeLine[i]) > 31:  # Gantt Chart Max Length
+            if len(timeLine[i]) > 30:  # Gantt Chart Max Length
                 timeLine[i].pop(0)
             if multiProcessor[i] == None:
                 timeLine[i].append(None)
@@ -217,7 +217,7 @@ class Algorithm :
             #else :
         # gantt chart(timeLine)
         for i in range(countOfProcessor):
-            if len(timeLine[i]) > 31:  # Gantt Chart Max Length
+            if len(timeLine[i]) > 30:  # Gantt Chart Max Length
                 timeLine[i].pop(0)
             if multiProcessor[i] == None:
                 timeLine[i].append(None)
@@ -276,7 +276,7 @@ class Algorithm :
             #else :
         # gantt chart(timeLine)
         for i in range(countOfProcessor):
-            if len(timeLine[i]) > 31:  # Gantt Chart Max Length
+            if len(timeLine[i]) > 30:  # Gantt Chart Max Length
                 timeLine[i].pop(0)
             if multiProcessor[i] == None:
                 timeLine[i].append(None)
@@ -329,7 +329,7 @@ class Algorithm :
             multiProcessor[multiProcessor.index(None)] = queue.pop(0)
 
         for i in range(countOfProcessor):
-            if len(timeLine[i]) > 31:  # Gantt Chart Max Length
+            if len(timeLine[i]) > 30:  # Gantt Chart Max Length
                 timeLine[i].pop(0)
             if multiProcessor[i] == None:
                 timeLine[i].append(None)

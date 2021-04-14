@@ -15,9 +15,9 @@ for i in range(1, 16):
     plist.append(globals()['p{}'.format(i)])
     at_start += random.randrange(1, 3)
 
-al = algorithms.Algorithm(plist, 1)
-execution_speed = 100  # 진행속도
-mp = 1  # multiprocess
+countOfProcessor = 1 # multiprocess
+al = algorithms.Algorithm(plist, countOfProcessor)
+execution_speed = 300  # 진행속도
 
 window = tkinter.Tk()
 window.title("운영체제 8조")
@@ -26,7 +26,7 @@ window.resizable(False, False)
 
 #font
 label_font = tkinter.font.Font(family="맑은 고딕", size=10, weight='bold')
-button_font = tkinter.font.Font(family="맑은 고딕", size=20, slant="italic", )
+button_font = tkinter.font.Font(family="맑은 고딕", size=20, slant="italic", )  
 table_font = ""
 
 # default setting
@@ -97,7 +97,6 @@ def show_ready_queue(*queue):
         y1 = 5
         x2 = 5 + 60 * count  # max = 935
         y2 = 70
-        # (60, 100)의 사각형으로 ready_queue 채우기
         rectangle = canvas_readyqueue.create_rectangle(
             x1, y1, x2, y2, fill=fill_color, width=2)
         text = canvas_readyqueue.create_text(
@@ -105,7 +104,7 @@ def show_ready_queue(*queue):
         count = count + 1
     canvas_readyqueue.place(x=510, y=100)
 
-def put_gantt_chart(*timeLine):
+def show_gantt_chart(*timeLine):
     canvas_ganttchart.delete("all")
     for mp in timeLine:
         count = 1
@@ -118,16 +117,12 @@ def put_gantt_chart(*timeLine):
             y1 = 5 + timeLine.index(mp) * (100/len(timeLine))
             x2 = 5 + 30 * count  # max = 935
             y2 = 5 + (100/len(timeLine)) + timeLine.index(mp) * (100/len(timeLine))
-            # (30, 65)의 사각형으로 gantt_chart 채우기
             rectangle = canvas_ganttchart.create_rectangle(
                 x1, y1, x2, y2, fill=fill_color, width=2)
             text = canvas_ganttchart.create_text(
                 x2-15, y2-((100/len(timeLine))/2), text=p.name, font=label_font)
             count = count + 1
     canvas_ganttchart.place(x=510, y=250, width=940, height=110)
-
-def show_realtime(t) :
-    text_runtime.set('RUNTIME : ' + str(execution_speed * t) + ' ms')
 
 def main():
     thread1 = None
@@ -136,18 +131,18 @@ def main():
     while True:
         start_time = time.time()
         # insert ready_process
-        return_queue, return_timeLine, return_finished, isEnd = al.rr_test(i)
+        return_queue, return_timeLine, return_finished, isEnd = al.srtn(i)
         i += 1
         text_runtime.set('RUNTIME : ' + str(execution_speed * i) + ' ms')
         if len(return_queue) != 0:
             thread1 = threading.Thread(
                 target=show_ready_queue, args=(return_queue))
             thread1.start()
-        else:
-            canvas_readyqueue.delete("all")
+        else :
+            canvas_readyqueue.delete("all") 
         if return_timeLine != None:
             thread2 = threading.Thread(
-                target=put_gantt_chart, args=return_timeLine)
+                target=show_gantt_chart, args=return_timeLine)
             thread2.start()
         for finish in return_finished :
             if finish != None:
@@ -162,9 +157,7 @@ def main():
             time.sleep(execution_speed/1000 - (time.time() - start_time))
         if isEnd:
             break
-# 라스트출력 문제있음
-
-
+        
 #show_gantt_chart()
 ttt = threading.Thread(target=main)
 ttt.start()
