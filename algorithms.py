@@ -130,19 +130,18 @@ class Algorithm :
         queue = self.queue
         timeLine = self.timeLine
         index = self.index
-        timeQ = self.timeQ
         finishProcess = []
         multiProcessor = self.multiProcessor
         countOfProcessor = self.countOfProcessor
         multiProcessorTime = self.multiProcessorTime
 
+        timeQ = 0 # timeQ를 가지고 있는 값으로 갱신할거 같으면 굳이 받아쓸필요 없음
         total_bt = 0
-        for p in queue :
-            total_bt += p.bt
-        if len(queue) == 0 :
-            timeQ = 0
-        else :
+        if len(queue) != 0 :
+            for p in queue :
+                total_bt += p.bt
             timeQ = (total_bt / len(queue))
+
 
         for i in range(countOfProcessor):
             if multiProcessor[i] != None and multiProcessorTime[i] == timeQ:
@@ -362,7 +361,13 @@ class Algorithm :
         if timeQ != None:
             self.timeQ = timeQ
         self.plist = plist
+        self.queue = []
+        self.timeLine = []
+        self.multiProcessor = []
+        self.multiProcessorTime = []
         self.countOfProcessor = countOfProcessor
+        self.resetIndex()
+
         for i in range(countOfProcessor):
             self.multiProcessor.append(None)
             self.multiProcessorTime.append(0)

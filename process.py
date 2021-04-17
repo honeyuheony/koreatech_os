@@ -20,10 +20,9 @@ class Process :
     def set_ntt(self) :
         self.ntt = self.tt/self.bt
 
-    def __init__(self, at, bt):
-        self.color = Process.color_list[Process.process_id]
-        Process.process_id = Process.process_id + 1
-        self.process_id = Process.process_id
+    def __init__(self, id, at, bt):
+        self.process_id = id
+        self.color = Process.color_list[self.process_id-1]
         self.name = "P" + str(self.process_id)
         self.at = at
         self.bt = bt
