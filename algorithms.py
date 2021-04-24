@@ -255,12 +255,6 @@ class Algorithm :
         multiProcessor = self.multiProcessor
         countOfProcessor = self.countOfProcessor
 
-        # 한 사이클 끝난 프로세스 아직 시간 남았으면 큐에 다시 집어넣기
-        for i in range(countOfProcessor):
-            if (multiProcessor[i] != None):
-                queue.append(multiProcessor[i])
-                multiProcessor[i] = None
-
         # ready queue(queue)
         while index < len(plist) and plist[index].at == t:
             queue.append(plist[index])
@@ -271,6 +265,18 @@ class Algorithm :
 
         while len(queue) != 0 and multiProcessor.count(None):
             multiProcessor[multiProcessor.index(None)] = queue.pop(0)
+
+        # 설명 : 멀티 프로세스에 있는 프로세스중 가장 시간이 많이 남은 프로세스보다 큐의 가장 앞에 있는 프로세스의 남은 시간이 더 짧다면 교체
+        while len(queue) != 0:
+            ind = 0
+            for i in range(countOfProcessor):
+                if multiProcessor[i] != None and multiProcessor[i].rt > multiProcessor[ind].rt:
+                    ind = i
+            if multiProcessor[ind].rt > queue[0].rt:
+                queue.append(multiProcessor[ind])
+                multiProcessor[ind] = queue.pop(0)
+            else:
+                break
 
             #else :
         # gantt chart(timeLine)

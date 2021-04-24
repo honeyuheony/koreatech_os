@@ -27,7 +27,13 @@ class Process :
         self.at = at
         self.bt = bt
         self.rt = bt
-        
+    
+    def reset(self):
+        self.wt = 0
+        self.tt = 0
+        self.ntt = 0
+        self.rt = self.bt
+
     def getResponseR(self):
         return (self.wt + self.bt) / self.bt
         
